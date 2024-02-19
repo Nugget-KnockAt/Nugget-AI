@@ -53,7 +53,6 @@ dependencies:
   geolocator: ^10.1.0
   flutter_tts: ^3.8.5
   tflite_flutter: ^0.10.1
-  # tflite_flutter_helper_plus: ^ 0.0.2 
   image: ^4.1.7
   path_provider: ^2.1.2
 

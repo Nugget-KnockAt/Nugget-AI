@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
 
-Future<List<String>> testYolov8(img.Image image, Interpreter interpreter) async {
+Future<List<String>> yolov8(img.Image image, Interpreter interpreter) async {
   // img.Image? image = await _loadImage('assets/images/any_image.png');
   // Interpreter interpreter = await Interpreter.fromAsset('assets/models/yolov8n_float16.tflite');
   try {
@@ -43,8 +43,6 @@ Future<List<String>> testYolov8(img.Image image, Interpreter interpreter) async 
     }
 
     print("Indices of values over 40%: $indices");
-
-    // print(get_labels(indices));
 
     return get_labels(indices);
   }

@@ -75,7 +75,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
         img.Image image = convertBGRA8888ToImage(cameraImage);
 
         try {
-          List<String> indices = await testYolov8(image, interpreter); // 비동기 처리
+          List<String> indices = await yolov8(image, interpreter); // 비동기 처리
           print(indices);
         } catch (e) {
           // 오류 처리
