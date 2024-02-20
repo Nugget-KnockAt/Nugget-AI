@@ -12,6 +12,7 @@ import 'dart:io';
 import 'yolo.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
+import 'dart:isolate';
 
 
 typedef void Callback(List<dynamic> list, int h, int w);
@@ -31,7 +32,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
   //추가
   int _frameCounter = 0; // 프레임 카운터 선언
-  final int _frameThreshold = 5; // 처리 프레임 설정
+  final int _frameThreshold = 90; // 처리 프레임 설정
 
   @override
   void initState() {
