@@ -19,39 +19,49 @@ Future<List<String>> yolov8(img.Image image, Interpreter interpreter) async {
     int predictionTime = DateTime.now().millisecondsSinceEpoch - predictionTimeStart;
     print('Prediction time: $predictionTime ms');
 
-    List<double> max_pred_list = List.filled(84, 0.0);
-    double premax_pred = 0;
+    List<dynamic> maxPredList = List.filled(84*5, 0.0).reshape([84,5]);
+    double premaxPred = 0;
     for(int i = 5; i < 84; i++){
-      premax_pred = 0;
+      premaxPred = 0;
+      List<double> tempBox = List.filled(4, 0.0);
       for(int t = 0; t < 8400; t++){
-        if(premax_pred < output[0][i][t]){
-          premax_pred = output[0][i][t];
+        if(premaxPred < output[0][i][t]){
+          premaxPred = output[0][i][t];
+          tempBox[0] = output[0][0][t];
+          tempBox[1] = output[0][1][t];
+          tempBox[2] = output[0][2][t];
+          tempBox[3] = output[0][3][t];
         }
       }
-      max_pred_list[i] = premax_pred;
+      maxPredList[i][4] = premaxPred;
+      maxPredList[i][0] = tempBox[0];
+      maxPredList[i][1] = tempBox[1];
+      maxPredList[i][2] = tempBox[2];
+      maxPredList[i][3] = tempBox[3];
     }
 
-    // print(max_pred_list);
-
     List<int> indices = [];
-    double threshold = 0.4; // 60%를 나타내는 임계값
+    double threshold = 0.4; // 임계값
+    List<dynamic> resultBox = [];
 
-    for (int i = 0; i < max_pred_list.length; i++) {
-      if (max_pred_list[i] > threshold) {
+    for (int i = 0; i < maxPredList.length; i++) {
+      if (maxPredList[i][4] > threshold) {
         indices.add(i);
+        resultBox.add(maxPredList[i].sublist(0,4));
       }
     }
 
+    print(resultBox);
     print("Indices of values over 40%: $indices");
-
-    return get_labels(indices);
+    
+    return getLabels(indices);
   }
   finally {
     // interpreter.close(); // 리소스 해제
   }  
 }
 
-List<String> get_labels(List<int> num) {
+List<String> getLabels(List<int> num) {
 
   List<String> objects = [
   'person', 'bicycle', 'car', 'motorbike', 'aeroplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
