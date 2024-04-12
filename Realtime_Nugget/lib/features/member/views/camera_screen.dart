@@ -17,6 +17,32 @@ import 'dart:isolate';
 
 typedef void Callback(List<dynamic> list, int h, int w);
 
+//록
+class BoundingBoxPainter extends CustomPainter {
+  final List<dynamic> boxes;
+  BoundingBoxPainter(this.boxes);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 3.0
+      ..style = PaintingStyle.stroke;
+
+    for (var box in boxes) {
+      final rect = Rect.fromLTWH(
+        322.1947937011719, //box[0], // left
+        275.7214050292969, // box[1], // top
+        623.7682495117188 - 322.1947937011719, // box[2] - box[0], // width
+        251.6856689453125 - 275.7214050292969 // box[3] - box[1], // height
+      );
+      canvas.drawRect(rect, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
 class CameraScreen extends ConsumerStatefulWidget {
   const CameraScreen({super.key});
 
@@ -29,6 +55,10 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
   late FlashMode _flashMode;
   bool _hasPermission = false;
   bool _isCameraInitialized = false;
+
+  //록
+  List<dynamic> _boundingBoxes = [];  // 바운딩 박스 데이터를 저장할 리스트
+
 
   //추가
   int _frameCounter = 0; // 프레임 카운터 선언
@@ -76,8 +106,9 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
         img.Image image = convertBGRA8888ToImage(cameraImage);
 
         try {
-          List<String> indices = await yolov8(image, interpreter); // 비동기 처리
+          List<dynamic> indices = await yolov8(image, interpreter); // 비동기 처리
           print(indices);
+          _boundingBoxes = [330.8822021484375, 317.3133850097656, 619.89404296875, 361.94329833984375];
         } catch (e) {
           // 오류 처리
           print(e.toString());
@@ -152,11 +183,22 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       body: _isCameraInitialized
           ? Stack(
               children: [
-                Positioned.fill(
-                  child: CameraPreview(
-                    _cameraController,
+                Positioned(
+                  child: CameraPreview(_cameraController),
+                ),
+                //록 추가
+                Positioned(child: Container(
+                    width: 619.89404296875 - 330.8822021484375,
+                    height: 361.94329833984375 - 317.3133850097656,
+                    decoration: const BoxDecoration(border: Border(
+                      left: BorderSide(color: Colors.red, width: 1),
+                      right: BorderSide(color: Colors.red, width: 1),
+                      top: BorderSide(color: Colors.red, width: 1),
+                      bottom: BorderSide(color: Colors.red, width: 1))
+                    ),
                   ),
                 ),
+                //록 추가 끝
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 20,
                   left: 20,
@@ -202,7 +244,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                       ),
                     ),
                   ),
-                )
+                ),
               ],
             )
           : const Center(
